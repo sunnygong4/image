@@ -1,0 +1,7 @@
+services:
+  immich-server:
+    ports:
+      - "2283:2283"
+  portfolio-web:
+    ports:
+      - "3000:3000"

@@ -1,0 +1,38 @@
+{
+  email {$ACME_EMAIL}
+}
+
+{$PORTFOLIO_HOST} {
+  encode zstd gzip
+
+  basic_auth /admin* /api/admin/* {
+    {$ADMIN_BASIC_AUTH_USER} {$ADMIN_BCRYPT_HASH}
+  }
+
+  header {
+    X-Frame-Options "SAMEORIGIN"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
+
+  reverse_proxy portfolio-web:3000
+}
+
+{$IMMICH_HOST} {
+  encode zstd gzip
+
+  request_body {
+    max_size 20GB
+  }
+
+  header {
+    X-Robots-Tag "noindex, nofollow, noarchive"
+  }
+
+  reverse_proxy immich-server:2283 {
+    header_up Host {host}
+    header_up X-Real-IP {remote_host}
+    header_up X-Forwarded-For {remote_host}
+    header_up X-Forwarded-Proto {scheme}
+  }
+}
+

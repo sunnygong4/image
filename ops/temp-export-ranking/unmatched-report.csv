@@ -1,0 +1,5 @@
+relative_path,filename,folder_hint,capture_at,primary_genre_guess,secondary_genre_guess,genre_confidence,duplicate_cluster_id,aesthetic_score,technical_score,uniqueness_score,ai_score,portfolio_role_guess,shortlist_flag,signature_flag
+"IMG_5261.jpg","IMG_5261.jpg","TempExport","","other","",0.3,"16c6c6de9a929e98:030323c3",0.4618,0.6674,1,0.5966,"archive",false,false
+"IMG_5255.jpg","IMG_5255.jpg","TempExport","","other","",0.3,"808080c40460e0e0:c0e0f0f0",0.4614,0.6103,1,0.5821,"archive",false,false
+"IMG_5260.jpg","IMG_5260.jpg","TempExport","","other","",0.3,"e0e06064ac98ec6d:3030b0b6",0.2812,0.5459,1,0.494,"archive",false,false
+"IMG_5124.jpg","IMG_5124.jpg","TempExport","","other","",0.3,"0f0d0d7171494317:00000018",0.2229,0.2245,1,0.3903,"archive",false,false

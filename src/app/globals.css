@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: #f3eee4;
+  --foreground: #16181f;
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-strong: rgba(255, 255, 255, 0.88);
+  --line: rgba(22, 24, 31, 0.1);
+  --muted: #5a6471;
+  --accent: #244447;
+  --accent-warm: #b76a39;
+  --display-font: "Iowan Old Style", "Palatino Linotype", "Book Antiqua",
+    "URW Palladio L", Georgia, serif;
+  --body-font: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 30%),
+    radial-gradient(circle at top right, rgba(183, 106, 57, 0.17), transparent 22%),
+    linear-gradient(180deg, #f7f1e8 0%, #efe9df 50%, #ece3d6 100%);
+  color: var(--foreground);
+  font-family: var(--body-font);
+}
+
+html.photo-route,
+body.photo-route {
+  overflow: hidden;
+  background: #000;
+}
+
+html:has([data-photo-route="true"]),
+body:has([data-photo-route="true"]) {
+  overflow: hidden;
+  background: #000;
+}
+
+body.photo-route::before {
+  display: none;
+}
+
+body:has([data-photo-route="true"])::before {
+  display: none;
+}
+
+body.photo-route .app-shell {
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body:has([data-photo-route="true"]) .app-shell {
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body.photo-route .app-main {
+  padding-bottom: 0;
+}
+
+body:has([data-photo-route="true"]) .app-main {
+  padding-bottom: 0;
+}
+
+body.photo-route .site-header,
+body.photo-route .site-footer {
+  display: none;
+}
+
+body:has([data-photo-route="true"]) .site-header,
+body:has([data-photo-route="true"]) .site-footer {
+  display: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(36, 68, 71, 0.05) 100%
+    ),
+    radial-gradient(circle at 1px 1px, rgba(22, 24, 31, 0.045) 1px, transparent 0);
+  background-size:
+    auto,
+    18px 18px;
+  z-index: -1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.display-font {
+  font-family: var(--display-font);
+}
+
+.surface {
+  background: var(--surface);
+  backdrop-filter: blur(18px);
+}
+
+.surface-strong {
+  background: var(--surface-strong);
+  backdrop-filter: blur(20px);
+}
+
+.input-field {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(22, 24, 31, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0.8rem 1rem;
+  color: var(--foreground);
+}
+
+.textarea-field {
+  width: 100%;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(22, 24, 31, 0.1);
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0.8rem 1rem;
+  color: var(--foreground);
+  resize: vertical;
+}
+
+.masonry-grid {
+  column-gap: 1.25rem;
+  column-count: 1;
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .masonry-grid {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 1100px) {
+  .masonry-grid {
+    column-count: 3;
+  }
+}

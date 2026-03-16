@@ -1,0 +1,39 @@
+{
+  "name": "immich-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc --module commonjs --target ES2022 --outDir .tmp-tests tests/run-tests.ts tests/visibility.test.ts src/lib/visibility.ts src/lib/types.ts && node .tmp-tests/tests/run-tests.js",
+    "rank:catalog": "py -3 scripts/rank_catalog.py",
+    "ai:annotate": "tsx scripts/annotate_with_gemini.ts",
+    "rank:import": "tsx scripts/import_ranking.ts",
+    "ai:export": "tsx scripts/export_public_selection.ts",
+    "test:promote-album": "tsx scripts/promote_test_album.ts",
+    "people:lightroom-export": "py -3 scripts/import_lightroom_faces.py",
+    "people:lightroom-import": "tsx scripts/import_lightroom_people.ts",
+    "people:immich-sync": "tsx scripts/sync_immich_people.ts"
+  },
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
