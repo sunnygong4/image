@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photos</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header id="toolbar">
+    <span id="photo-count">Photos</span>
+    <div id="zoom-control">
+      <span class="zoom-icon">-</span>
+      <input type="range" id="zoom-slider" min="2" max="12" step="1" value="5">
+      <span class="zoom-icon">+</span>
+    </div>
+    <button id="nav-toggle" title="Timeline">&#9776;</button>
+  </header>
+
+  <main id="gallery"></main>
+
+  <nav id="timeline-nav" class="hidden">
+    <div id="timeline-content"></div>
+  </nav>
+  <div id="timeline-backdrop" class="hidden"></div>
+
+  <div id="scroll-indicator" class="hidden"></div>
+
+  <!-- Lightbox (preserved from previous version) -->
+  <div id="lightbox" class="hidden">
+    <div id="lightbox-backdrop"></div>
+    <div id="lightbox-img-container">
+      <img id="lightbox-img" src="">
+    </div>
+    <div id="lightbox-spinner" class="spinner hidden"></div>
+    <button id="lightbox-close">&times;</button>
+    <button id="lightbox-prev">&lsaquo;</button>
+    <button id="lightbox-next">&rsaquo;</button>
+    <div id="lightbox-info"></div>
+    <div id="film-strip"></div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
