@@ -18,7 +18,8 @@
     "test:promote-album": "tsx scripts/promote_test_album.ts",
     "people:lightroom-export": "py -3 scripts/import_lightroom_faces.py",
     "people:lightroom-import": "tsx scripts/import_lightroom_people.ts",
-    "people:immich-sync": "tsx scripts/sync_immich_people.ts"
+    "people:immich-sync": "tsx scripts/sync_immich_people.ts",
+    "albums:from-folders": "tsx scripts/create_albums_from_folders.ts"
   },
   "dependencies": {
     "next": "^15.0.0",

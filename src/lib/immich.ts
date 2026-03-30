@@ -232,6 +232,61 @@ export async function checkImmichConnection() {
   }
 }
 
+export async function searchImmichAssetsByLibrary(
+  libraryId: string,
+  page = 1,
+  size = 1000,
+) {
+  const payload = await searchImmichAssets({
+    libraryId,
+    page,
+    size,
+    withExif: false,
+  });
+
+  const items = extractSearchItems(payload);
+  if (!items) {
+    return [] as ImmichAsset[];
+  }
+
+  return items.map(normalizeAsset);
+}
+
+export async function createImmichAlbum(
+  albumName: string,
+  description?: string,
+  assetIds?: string[],
+) {
+  const body: Record<string, unknown> = { albumName };
+  if (description) body.description = description;
+  if (assetIds?.length) body.assetIds = assetIds;
+
+  return requestJson<{ id: string; albumName: string }>(
+    ["/api/albums", "/api/album"],
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    },
+  );
+}
+
+export async function addAssetsToImmichAlbum(
+  albumId: string,
+  assetIds: string[],
+) {
+  return requestJson<unknown>(
+    [`/api/albums/${albumId}/assets`, `/api/album/${albumId}/assets`],
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids: assetIds }),
+      cache: "no-store",
+    },
+  );
+}
+
 async function searchImmichAssets(body: Record<string, unknown>) {
   return requestJson<unknown>(
     ["/api/search/metadata", "/api/search/assets"],
@@ -280,6 +335,7 @@ function normalizeAsset(input: unknown): ImmichAsset {
     id: String(record.id ?? ""),
     type: String(record.type ?? inferAssetType(originalFileName)),
     originalFileName,
+    originalPath: nullableString(record.originalPath),
     originalMimeType: nullableString(
       record.originalMimeType ?? record.mimeType ?? null,
     ),

@@ -15,6 +15,8 @@
   --display-font: "Iowan Old Style", "Palatino Linotype", "Book Antiqua",
     "URW Palladio L", Georgia, serif;
   --body-font: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --mono-font: "Cascadia Mono", "Consolas", "Lucida Console", "Courier New",
+    monospace;
 }
 
 * {
@@ -179,5 +181,146 @@ textarea {
 @media (min-width: 1100px) {
   .masonry-grid {
     column-count: 3;
+  }
+}
+
+/* ── Footer (dark, matching sunnygong.com) ── */
+.footer-wrap {
+  width: 100%;
+  padding: 2.4rem clamp(1.5rem, 4vw, 3rem) 1.6rem;
+  background: linear-gradient(180deg, rgba(8, 14, 24, 0.96), rgba(4, 8, 16, 0.99));
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.footer-brand {
+  flex-shrink: 0;
+}
+
+.footer-signature {
+  width: clamp(7rem, 12vw, 10rem);
+  height: auto;
+  opacity: 0.7;
+  transition: opacity 220ms ease;
+}
+
+.footer-signature:hover {
+  opacity: 1;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.footer-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 248, 238, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #c9d5e6;
+  font-family: "Cascadia Mono", "Consolas", "Lucida Console", "Courier New", monospace;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease,
+    transform 180ms ease, box-shadow 180ms ease;
+}
+
+.footer-nav-btn:hover,
+.footer-nav-btn:focus-visible {
+  color: #f8fafc;
+  background: rgba(139, 92, 246, 0.18);
+  border-color: rgba(139, 92, 246, 0.36);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.12);
+}
+
+.footer-social {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.footer-social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: rgba(255, 248, 238, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #c9d5e6;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease,
+    transform 220ms ease, box-shadow 220ms ease;
+}
+
+.footer-social-btn svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.footer-social-btn:hover,
+.footer-social-btn:focus-visible {
+  color: #fff;
+  background: rgba(139, 92, 246, 0.22);
+  border-color: rgba(139, 92, 246, 0.44);
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.18);
+}
+
+.footer-divider {
+  max-width: 1400px;
+  margin: 1.6rem auto 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 1400px;
+  margin: 1rem auto 0;
+}
+
+.footer-copy {
+  color: #c9d5e6;
+  font-family: "Cascadia Mono", "Consolas", "Lucida Console", "Courier New", monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+@media (max-width: 720px) {
+  .footer-top {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.4rem;
+  }
+
+  .footer-nav {
+    justify-content: center;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.3rem;
   }
 }

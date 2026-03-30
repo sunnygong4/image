@@ -1,3 +1,6 @@
+export const MAIN_SITE_URL = "https://sunnygong.com";
+export const BLOG_SITE_URL = "https://blog.sunnygong.com";
+
 export const SITE_TITLE = "Sunny Gong Photography";
 
 export const SITE_SHORT_BIO =
@@ -23,6 +26,37 @@ export const HOME_NAV_LINKS = [
   { href: "/work/wildlife", label: "Wildlife" },
   { href: "/work/event", label: "Events" },
   { href: "/contact", label: "Contact" },
+] as const;
+
+export const CROSS_SITE_NAV_LINKS = [
+  { href: MAIN_SITE_URL, label: "Home" },
+  { href: "/", label: "Gallery" },
+  { href: `${MAIN_SITE_URL}/projects/`, label: "Projects" },
+  { href: BLOG_SITE_URL, label: "Writing" },
+  { href: `${MAIN_SITE_URL}/about/`, label: "About" },
+] as const;
+
+export const SOCIAL_LINKS = [
+  {
+    label: "Instagram",
+    href: "https://instagram.com/sunny.gong5",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/fangxu-gong-7b9b26221/",
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/sunnygong4/",
+  },
+  {
+    label: "Email",
+    href: "mailto:sunny.gong4@gmail.com",
+  },
+  {
+    label: "Discord",
+    href: "https://discord.gg/ayP5tPZW",
+  },
 ] as const;
 
 export const HOME_FOCUS_LINKS = [

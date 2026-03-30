@@ -1,11 +1,11 @@
 import Link from "next/link";
 
+import { AlbumCard } from "@/components/album-card";
 import { PhotoCard } from "@/components/photo-card";
 import { getHomePageData } from "@/lib/portfolio";
 import {
   HERO_PORTRAIT_ALT,
   HERO_PORTRAIT_SRC,
-  HOME_FOCUS_LINKS,
   HOME_HERO_DETAILS,
   HOME_INTRO,
   HOME_ROLE_LINE,
@@ -145,103 +145,50 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id={SIGNATURE_SECTION_ID} className="space-y-5 scroll-mt-28">
-        <div className="surface-strong rounded-[2rem] border border-black/10 px-5 py-5 shadow-soft sm:px-6 sm:py-6">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-[11px] uppercase tracking-[0.34em] text-dusk">
-                Signature portfolio
-              </p>
-              <h2 className="display-font mt-2 text-[2.1rem] leading-none text-ink sm:text-[2.6rem]">
-                The work I want people to linger on.
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-dusk sm:text-base">
-                Landscape and wildlife sit at the center of the portfolio, with
-                street and event work expanding outward from there.
-              </p>
+      <section id={SIGNATURE_SECTION_ID} className="scroll-mt-28">
+        <div className="surface-strong overflow-hidden rounded-[2rem] border border-black/10 shadow-soft">
+          {hasLiveSignatureAssets ? (
+            <div className="masonry-grid p-5 sm:p-6">
+              {data.signatureAssets.map((asset) => (
+                <PhotoCard key={asset.id} asset={asset} />
+              ))}
             </div>
-            <Link
-              href="/work/landscape"
-              className="inline-flex items-center rounded-full border border-black/10 bg-white/80 px-4 py-2 text-sm font-medium text-dusk transition hover:border-pine/30 hover:text-pine"
-            >
-              Open landscape gallery
-            </Link>
-          </div>
-
-          {previewMode ? (
-            <p className="mt-4 text-sm text-dusk/80">
-              Immich is not reachable in this local session, so the gallery below is
-              shown as a visual preview.
-            </p>
-          ) : null}
+          ) : (
+            <div className="grid gap-4 p-5 sm:p-6 lg:grid-cols-3">
+              {PREVIEW_SIGNATURES.map((item) => (
+                <article
+                  key={item.title}
+                  className="relative overflow-hidden rounded-[1.75rem] p-5 sm:p-6"
+                >
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${item.tone} opacity-[0.92]`}
+                  />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_35%)]" />
+                  <div className="relative flex min-h-[19rem] flex-col justify-end text-white">
+                    <p className="text-[11px] uppercase tracking-[0.34em] text-white/72">
+                      Portfolio preview
+                    </p>
+                    <h3 className="display-font mt-2 text-[2.2rem] leading-none">
+                      {item.title}
+                    </h3>
+                    <p className="mt-3 max-w-sm text-sm leading-7 text-white/82">
+                      {item.description}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
-
-        {hasLiveSignatureAssets ? (
-          <div className="masonry-grid">
-            {data.signatureAssets.map((asset) => (
-              <PhotoCard key={asset.id} asset={asset} />
-            ))}
-          </div>
-        ) : (
-          <div className="grid gap-4 lg:grid-cols-3">
-            {PREVIEW_SIGNATURES.map((item) => (
-              <article
-                key={item.title}
-                className={`surface-strong relative overflow-hidden rounded-[2rem] border border-black/10 p-5 shadow-soft sm:p-6`}
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${item.tone} opacity-[0.92]`}
-                />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_35%)]" />
-                <div className="relative flex min-h-[19rem] flex-col justify-end text-white">
-                  <p className="text-[11px] uppercase tracking-[0.34em] text-white/72">
-                    Portfolio preview
-                  </p>
-                  <h3 className="display-font mt-2 text-[2.2rem] leading-none">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 max-w-sm text-sm leading-7 text-white/82">
-                    {item.description}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {HOME_FOCUS_LINKS.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="surface-strong group rounded-[1.7rem] border border-black/10 p-5 shadow-soft transition hover:-translate-y-1 hover:border-pine/25"
-          >
-            <p className="text-[11px] uppercase tracking-[0.34em] text-dusk">
-              Gallery
-            </p>
-            <h3 className="display-font mt-3 text-[2rem] leading-none text-ink">
-              {link.label}
-            </h3>
-            <p className="mt-3 text-sm leading-7 text-dusk">{link.body}</p>
-            <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-pine">
-              Explore
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4 transition group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14" />
-                <path d="m13 6 6 6-6 6" />
-              </svg>
-            </span>
-          </Link>
-        ))}
-      </section>
+      {data.featuredAlbums.length > 0 ? (
+        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {data.featuredAlbums.map((album) => (
+            <AlbumCard key={album.id} album={album} />
+          ))}
+        </section>
+      ) : null}
     </div>
   );
 }

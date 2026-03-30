@@ -147,6 +147,7 @@ export interface ImmichAsset {
   id: string;
   type: string;
   originalFileName: string;
+  originalPath?: string | null;
   originalMimeType?: string | null;
   fileCreatedAt?: string | null;
   fileModifiedAt?: string | null;

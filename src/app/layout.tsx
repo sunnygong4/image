@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import "@/app/globals.css";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SITE_SHORT_BIO, SITE_TITLE } from "@/lib/site-content";
 
@@ -21,10 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="app-shell mx-auto min-h-screen max-w-7xl px-4 py-4 md:px-6 md:py-6">
-          <SiteHeader />
+        <SiteHeader />
+        <div className="app-shell mx-auto min-h-screen max-w-7xl px-4 pb-4 pt-20 md:px-6 md:pb-6 md:pt-24">
           <main className="app-main pb-12">{children}</main>
         </div>
+        <SiteFooter />
       </body>
     </html>
   );

@@ -10,8 +10,8 @@ services:
       - portfolio-web
       - immich-server
     ports:
-      - "80:80"
-      - "443:443"
+      - "8380:8380"
+      - "8280:8280"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

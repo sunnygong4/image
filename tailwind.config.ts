@@ -4,6 +4,15 @@ const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
+      fontFamily: {
+        mono: [
+          "Cascadia Mono",
+          "Consolas",
+          "Lucida Console",
+          "Courier New",
+          "monospace",
+        ],
+      },
       colors: {
         ink: "#16181f",
         paper: "#efe9df",
