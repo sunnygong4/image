@@ -66,11 +66,10 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-end justify-between gap-5">
+            <div className="mt-8">
               <p className="max-w-md text-xs uppercase tracking-[0.3em] text-dusk/88">
                 {HOME_HERO_DETAILS.join(" / ")}
               </p>
-              <ViewWorkLink />
             </div>
           </div>
 
@@ -140,7 +139,6 @@ export default async function HomePage() {
             <p className="max-w-md text-sm uppercase tracking-[0.28em] text-dusk/88 lg:text-right">
               {HOME_HERO_DETAILS.join(" / ")}
             </p>
-            <ViewWorkLink />
           </div>
         </div>
       </section>
@@ -190,34 +188,6 @@ export default async function HomePage() {
         </section>
       ) : null}
     </div>
-  );
-}
-
-function ViewWorkLink() {
-  return (
-    <Link
-      href={`#${SIGNATURE_SECTION_ID}`}
-      className="group inline-flex items-center gap-3 self-start rounded-full bg-pine px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#1f3c3f]"
-    >
-      <span>View my work</span>
-      <span
-        aria-hidden="true"
-        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 transition group-hover:translate-y-0.5"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          className="h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 5v14" />
-          <path d="m6 13 6 6 6-6" />
-        </svg>
-      </span>
-    </Link>
   );
 }
 

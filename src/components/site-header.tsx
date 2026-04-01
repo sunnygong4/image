@@ -75,7 +75,21 @@ export function SiteHeader() {
         </button>
 
         {/* Desktop nav — gallery links by default, site links when logo is hovered */}
-        <div className="relative hidden md:flex">
+        <div className="relative hidden md:flex items-center">
+          {/* Gallery Home link */}
+          <Link
+            href="/"
+            className={`whitespace-nowrap rounded-full px-[0.92rem] py-[0.58rem] font-mono text-[0.95rem] transition-all duration-300 ${
+              isSiteMode ? "opacity-0 pointer-events-none" : ""
+            } ${
+              pathname === "/"
+                ? "bg-pine/14 text-pine"
+                : "text-dusk hover:bg-black/5 hover:text-ink"
+            }`}
+          >
+            Gallery Home
+          </Link>
+
           {/* Gallery links (default) */}
           <nav className={`flex items-center gap-[0.5rem] transition-all duration-300 ${
             isSiteMode ? "opacity-0 pointer-events-none" : ""
