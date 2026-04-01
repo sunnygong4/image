@@ -5,7 +5,10 @@
 :8380 {
 	encode zstd gzip
 
-	basic_auth /admin* /api/admin/* {
+	@admin {
+		path /admin* /api/admin/*
+	}
+	basic_auth @admin {
 		{$ADMIN_BASIC_AUTH_USER} {$ADMIN_BCRYPT_HASH}
 	}
 
