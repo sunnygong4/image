@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.claude
+.env
+.env.*
+!.env.example
+photo-browser
+data
+scripts
+ops
+*.md
