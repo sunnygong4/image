@@ -33,7 +33,7 @@ export default async function PhotoPage({
   return (
     <PhotoViewer
       asset={asset}
-      fullsizeUrl={`/api/media/${asset.id}/thumb?size=fullsize`}
+      fullsizeUrl={`/api/media/${asset.id}/thumb?size=preview`}
       navigation={{
         albumTitle: album?.title ?? null,
         backHref: album ? `/albums/${album.slug}` : "/albums",
