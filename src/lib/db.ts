@@ -420,9 +420,10 @@ export function upsertAlbumDefaults(input: AlbumConfigInput) {
         INSERT INTO album_configs (
           immich_album_id,
           slug,
-          cover_asset_id
+          cover_asset_id,
+          visibility
         )
-        VALUES (?, ?, ?)
+        VALUES (?, ?, ?, 'public')
         ON CONFLICT(immich_album_id) DO UPDATE SET
           cover_asset_id = COALESCE(album_configs.cover_asset_id, excluded.cover_asset_id)
       `,

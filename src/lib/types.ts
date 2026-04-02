@@ -229,6 +229,7 @@ export interface PublicAlbum {
   featured: boolean;
   sortOrder: number;
   shareUrl: string | null;
+  startDate: string | null;
   assets?: PublicAsset[];
 }
 

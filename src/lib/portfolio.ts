@@ -92,7 +92,6 @@ interface PortfolioAssetQuery {
 
 export async function getHomePageData() {
   const publicAlbums = await getPublicAlbums();
-  const featuredAlbums = publicAlbums.filter((album) => album.featured);
   const signatureAssets = await getPortfolioAssets({
     genres: [...SIGNATURE_GENRES],
     roles: ["signature"],
@@ -101,8 +100,7 @@ export async function getHomePageData() {
   });
 
   return {
-    featuredAlbums:
-      (featuredAlbums.length ? featuredAlbums : publicAlbums).slice(0, 3),
+    featuredAlbums: publicAlbums,
     featuredPeople: (await getPublicPeople()).slice(0, 4),
     signatureAssets:
       signatureAssets.length > 0
@@ -692,6 +690,7 @@ function buildPublicAlbumSummary(
     featured: config.featured,
     sortOrder: config.sortOrder,
     shareUrl: config.shareUrl,
+    startDate: album.startDate ?? null,
   } satisfies PublicAlbum;
 }
 
@@ -940,9 +939,11 @@ function compareAssetIds(
 }
 
 function sortAlbumSummaries(a: PublicAlbum, b: PublicAlbum) {
+  const aDate = a.startDate ? new Date(a.startDate).getTime() : 0;
+  const bDate = b.startDate ? new Date(b.startDate).getTime() : 0;
   return (
     Number(b.featured) - Number(a.featured) ||
-    a.sortOrder - b.sortOrder ||
+    bDate - aDate ||
     a.title.localeCompare(b.title)
   );
 }

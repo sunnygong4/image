@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-import { AlbumCard } from "@/components/album-card";
+import { AlbumGrid } from "@/components/album-grid";
 import { PhotoCard } from "@/components/photo-card";
 import { getHomePageData } from "@/lib/portfolio";
 import {
@@ -180,13 +178,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {data.featuredAlbums.length > 0 ? (
-        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {data.featuredAlbums.map((album) => (
-            <AlbumCard key={album.id} album={album} />
-          ))}
-        </section>
-      ) : null}
+      <AlbumGrid albums={data.featuredAlbums} />
     </div>
   );
 }
