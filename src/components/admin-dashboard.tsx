@@ -22,6 +22,7 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
   const [albumFilter, setAlbumFilter] = useState("");
   const [peopleFilter, setPeopleFilter] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [isAlbumSyncPending, startAlbumSyncTransition] = useTransition();
   const [isPeopleSyncPending, startPeopleSyncTransition] = useTransition();
   const [isSavePending, startSaveTransition] = useTransition();
@@ -366,7 +367,7 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
             </h2>
             <p className="mt-2 text-sm text-dusk">
               {selectedAlbum
-                ? "Per-photo settings now include genre, role, review state, and the linked people already detected."
+                ? `${data.selectedAlbumAssets.length} photos — click a photo to edit it.`
                 : "Pick an album from the left to inspect its photo-level settings."}
             </p>
           </Panel>
@@ -374,171 +375,130 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
           {selectedAlbum ? (
             <div className="space-y-4">
               {data.selectedAlbumAssets.length ? (
-                data.selectedAlbumAssets.map((asset) => (
-                  <form
-                    key={asset.id}
-                    onSubmit={(event) => handleAssetSubmit(event, asset.id)}
-                    className="surface rounded-[1.75rem] border border-black/10 p-4 shadow-soft"
-                  >
-                    <input type="hidden" name="albumId" value={asset.albumId} />
-                    <div className="grid gap-4 lg:grid-cols-[120px_1fr]">
-                      <div className="overflow-hidden rounded-[1.25rem] border border-black/10 bg-ink/5">
+                <>
+                  {/* Photo grid */}
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-5">
+                    {data.selectedAlbumAssets.map((asset) => (
+                      <button
+                        key={asset.id}
+                        type="button"
+                        onClick={() => setSelectedAssetId(asset.id === selectedAssetId ? null : asset.id)}
+                        className={cn(
+                          "group relative aspect-square overflow-hidden rounded-xl border-2 transition",
+                          asset.id === selectedAssetId
+                            ? "border-pine ring-2 ring-pine/30"
+                            : "border-transparent hover:border-black/20",
+                        )}
+                      >
                         <img src={asset.thumbUrl} alt={asset.title} className="h-full w-full object-cover" />
-                      </div>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="display-font text-2xl text-ink">{asset.title}</p>
-                          <p className="text-sm text-dusk">{asset.originalFileName}</p>
-                          {asset.linkedPeople.length ? (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                              {asset.linkedPeople.map((person) => (
-                                <span
-                                  key={`${asset.id}-${person.id}`}
-                                  className="rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs uppercase tracking-[0.22em] text-dusk"
-                                >
-                                  {person.displayName} · {person.visibility}
-                                </span>
-                              ))}
-                            </div>
-                          ) : null}
+                        <div className="absolute inset-0 bg-black/0 transition group-hover:bg-black/20" />
+                        <div className="absolute bottom-0 left-0 right-0 translate-y-full bg-black/70 px-1.5 py-1 text-[9px] text-white transition group-hover:translate-y-0 truncate">
+                          {asset.title}
                         </div>
+                      </button>
+                    ))}
+                  </div>
 
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <Field label="Visibility">
-                            <select name="visibility" defaultValue={asset.visibility} className="input-field">
-                              <option value="inherit">Inherit album</option>
-                              <option value="private">Private</option>
-                              <option value="public">Public</option>
-                            </select>
-                          </Field>
-                          <Field label="Sort order">
-                            <input name="sortOrder" type="number" defaultValue={asset.sortOrder} className="input-field" />
-                          </Field>
-                          <Field label="Primary genre">
-                            <select name="primaryGenre" defaultValue={asset.primaryGenre ?? ""} className="input-field">
-                              <option value="">None</option>
-                              {PORTFOLIO_GENRES.map((genre) => (
-                                <option key={genre} value={genre}>{genre}</option>
-                              ))}
-                            </select>
-                          </Field>
-                          <Field label="Secondary genre">
-                            <select name="secondaryGenre" defaultValue={asset.secondaryGenre ?? ""} className="input-field">
-                              <option value="">None</option>
-                              {PORTFOLIO_GENRES.map((genre) => (
-                                <option key={genre} value={genre}>{genre}</option>
-                              ))}
-                            </select>
-                          </Field>
-                          <Field label="Portfolio role">
-                            <select name="portfolioRole" defaultValue={asset.portfolioRole} className="input-field">
-                              {PORTFOLIO_ROLES.map((role) => (
-                                <option key={role} value={role}>{role}</option>
-                              ))}
-                            </select>
-                          </Field>
-                          <Field label="Review state">
-                            <select name="reviewState" defaultValue={asset.reviewState} className="input-field">
-                              {REVIEW_STATES.map((state) => (
-                                <option key={state} value={state}>{state}</option>
-                              ))}
-                            </select>
-                          </Field>
-                          <Field label="Title override" span="full">
-                            <input name="titleOverride" defaultValue={asset.titleOverride ?? ""} className="input-field" />
-                          </Field>
-                          <Field label="Description override" span="full">
-                            <textarea
-                              name="descriptionOverride"
-                              defaultValue={asset.descriptionOverride ?? ""}
-                              rows={3}
-                              className="textarea-field"
-                            />
-                          </Field>
-                        </div>
-
-                        {asset.aiSummary || asset.aiTags.length ? (
-                          <div className="rounded-[1.25rem] border border-pine/15 bg-pine/[0.07] px-4 py-4">
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                              <div>
-                                <p className="text-xs uppercase tracking-[0.26em] text-dusk">
-                                  AI suggestion
-                                </p>
-                                <p className="mt-2 text-sm leading-7 text-dusk">
-                                  {asset.aiSummary ?? "No AI summary generated yet."}
-                                </p>
-                              </div>
-                              {asset.aiSummary ? (
-                                <button
-                                  type="button"
-                                  onClick={(event) => {
-                                    const form = event.currentTarget.form;
-                                    const field = form?.elements.namedItem("descriptionOverride");
-                                    if (field instanceof HTMLTextAreaElement) {
-                                      field.value = asset.aiSummary ?? "";
-                                    }
-                                  }}
-                                  className="rounded-full border border-black/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-dusk transition hover:border-pine/30 hover:text-pine"
-                                >
-                                  Copy to description
-                                </button>
-                              ) : null}
-                            </div>
-
-                            {asset.aiTags.length ? (
-                              <div className="mt-4 flex flex-wrap gap-2">
-                                {asset.aiTags.map((tag) => (
-                                  <span
-                                    key={`${asset.id}-${tag}`}
-                                    className="rounded-full border border-black/10 bg-white/75 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-dusk"
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : null}
-
-                            <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs uppercase tracking-[0.2em] text-dusk/80">
-                              <span>Model: {asset.aiModel ?? "--"}</span>
-                              <span>Provider: {asset.aiProvider ?? "--"}</span>
-                              <span>Export: {asset.exportCandidate ? "candidate" : "no"}</span>
-                            </div>
+                  {/* Selected photo editor */}
+                  {selectedAssetId ? (() => {
+                    const asset = data.selectedAlbumAssets.find(a => a.id === selectedAssetId);
+                    if (!asset) return null;
+                    return (
+                      <form
+                        key={asset.id}
+                        onSubmit={(event) => handleAssetSubmit(event, asset.id)}
+                        className="surface rounded-[1.75rem] border border-pine/20 p-5 shadow-soft"
+                      >
+                        <input type="hidden" name="albumId" value={asset.albumId} />
+                        <div className="flex items-start gap-4 mb-5">
+                          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-[1rem] border border-black/10 bg-ink/5">
+                            <img src={asset.previewUrl} alt={asset.title} className="h-full w-full object-cover" />
                           </div>
-                        ) : null}
-
-                        <div className="grid gap-3 rounded-[1.25rem] border border-black/10 bg-white/60 px-4 py-3 text-sm text-dusk md:grid-cols-5">
-                          <span>AI: {asset.aiScore?.toFixed(2) ?? "--"}</span>
-                          <span>Semantic: {asset.semanticScore?.toFixed(2) ?? "--"}</span>
-                          <span>Aesthetic: {asset.aestheticScore?.toFixed(2) ?? "--"}</span>
-                          <span>Technical: {asset.technicalScore?.toFixed(2) ?? "--"}</span>
-                          <span>Unique: {asset.uniquenessScore?.toFixed(2) ?? "--"}</span>
-                          <span>Confidence: {asset.genreConfidence?.toFixed(2) ?? "--"}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="display-font text-xl text-ink truncate">{asset.title}</p>
+                            <p className="text-sm text-dusk">{asset.originalFileName}</p>
+                            <button
+                              type="button"
+                              onClick={() => runJsonAction(
+                                `/api/admin/albums/${asset.albumId}`,
+                                { coverAssetId: asset.id },
+                                "Cover photo updated.",
+                              )}
+                              className="mt-2 rounded-full border border-pine/30 bg-pine/10 px-3 py-1.5 text-xs font-semibold text-pine transition hover:bg-pine hover:text-white"
+                            >
+                              Set as album cover
+                            </button>
+                          </div>
                         </div>
-
-                        <div className="flex flex-wrap gap-4">
-                          <label className="inline-flex items-center gap-3 text-sm font-medium text-ink">
-                            <input name="featured" type="checkbox" defaultChecked={asset.featured} className="h-4 w-4 rounded border-black/20" />
-                            Feature in album contexts
-                          </label>
-                          <label className="inline-flex items-center gap-3 text-sm font-medium text-ink">
-                            <input name="allowDownload" type="checkbox" defaultChecked={asset.allowDownload} className="h-4 w-4 rounded border-black/20" />
-                            Allow public download
-                          </label>
+                        <div className="space-y-4">
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <Field label="Visibility">
+                              <select name="visibility" defaultValue={asset.visibility} className="input-field">
+                                <option value="inherit">Inherit album</option>
+                                <option value="private">Private</option>
+                                <option value="public">Public</option>
+                              </select>
+                            </Field>
+                            <Field label="Sort order">
+                              <input name="sortOrder" type="number" defaultValue={asset.sortOrder} className="input-field" />
+                            </Field>
+                            <Field label="Primary genre">
+                              <select name="primaryGenre" defaultValue={asset.primaryGenre ?? ""} className="input-field">
+                                <option value="">None</option>
+                                {PORTFOLIO_GENRES.map((genre) => (
+                                  <option key={genre} value={genre}>{genre}</option>
+                                ))}
+                              </select>
+                            </Field>
+                            <Field label="Secondary genre">
+                              <select name="secondaryGenre" defaultValue={asset.secondaryGenre ?? ""} className="input-field">
+                                <option value="">None</option>
+                                {PORTFOLIO_GENRES.map((genre) => (
+                                  <option key={genre} value={genre}>{genre}</option>
+                                ))}
+                              </select>
+                            </Field>
+                            <Field label="Portfolio role">
+                              <select name="portfolioRole" defaultValue={asset.portfolioRole} className="input-field">
+                                {PORTFOLIO_ROLES.map((role) => (
+                                  <option key={role} value={role}>{role}</option>
+                                ))}
+                              </select>
+                            </Field>
+                            <Field label="Review state">
+                              <select name="reviewState" defaultValue={asset.reviewState} className="input-field">
+                                {REVIEW_STATES.map((state) => (
+                                  <option key={state} value={state}>{state}</option>
+                                ))}
+                              </select>
+                            </Field>
+                            <Field label="Title override" span="full">
+                              <input name="titleOverride" defaultValue={asset.titleOverride ?? ""} className="input-field" />
+                            </Field>
+                            <Field label="Description override" span="full">
+                              <textarea name="descriptionOverride" defaultValue={asset.descriptionOverride ?? ""} rows={3} className="textarea-field" />
+                            </Field>
+                          </div>
+                          <div className="flex flex-wrap items-center justify-between gap-4">
+                            <div className="flex flex-wrap gap-4">
+                              <label className="inline-flex items-center gap-2 text-sm font-medium text-ink">
+                                <input name="featured" type="checkbox" defaultChecked={asset.featured} className="h-4 w-4 rounded border-black/20" />
+                                Featured
+                              </label>
+                              <label className="inline-flex items-center gap-2 text-sm font-medium text-ink">
+                                <input name="allowDownload" type="checkbox" defaultChecked={asset.allowDownload} className="h-4 w-4 rounded border-black/20" />
+                                Allow download
+                              </label>
+                            </div>
+                            <button type="submit" disabled={isSavePending} className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-pine disabled:cursor-not-allowed disabled:bg-dusk">
+                              {isSavePending ? "Saving..." : "Save photo"}
+                            </button>
+                          </div>
                         </div>
-
-                        <div className="flex justify-end">
-                          <button
-                            type="submit"
-                            disabled={isSavePending}
-                            className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-pine disabled:cursor-not-allowed disabled:bg-dusk"
-                          >
-                            {isSavePending ? "Saving..." : "Save photo"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                ))
+                      </form>
+                    );
+                  })() : null}
+                </>
               ) : (
                 <Panel>This album does not have any synced image assets yet.</Panel>
               )}
