@@ -19,12 +19,20 @@ export function AlbumCard({ album }: AlbumCardProps) {
             src={`/api/media/${album.coverAssetId}/thumb?size=preview`}
             alt={album.title}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+            onError={(e) => {
+              const el = e.currentTarget;
+              el.style.display = "none";
+              const fallback = el.nextElementSibling as HTMLElement | null;
+              if (fallback) fallback.style.display = "flex";
+            }}
           />
-        ) : (
-          <div className="flex h-full items-end bg-gradient-to-br from-pine/30 via-amber-100 to-white p-6">
-            <span className="display-font text-4xl text-ink">{album.title}</span>
-          </div>
-        )}
+        ) : null}
+        <div
+          style={{ display: album.coverAssetId ? "none" : "flex" }}
+          className="h-full items-end bg-gradient-to-br from-pine/30 via-amber-100 to-white p-6"
+        >
+          <span className="display-font text-4xl text-ink">{album.title}</span>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
           <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.32em] text-white/70">
