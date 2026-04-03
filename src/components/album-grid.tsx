@@ -5,7 +5,7 @@ import { useState } from "react";
 import { AlbumCard } from "@/components/album-card";
 import type { PublicAlbum } from "@/lib/types";
 
-const DEFAULT_SHOW = 9;
+const DEFAULT_SHOW = 25;
 
 export function AlbumGrid({ albums }: { albums: PublicAlbum[] }) {
   const [expanded, setExpanded] = useState(false);
