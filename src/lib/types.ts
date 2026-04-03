@@ -44,6 +44,7 @@ export interface PortfolioAlbumConfig {
   immichDescription: string | null;
   immichThumbnailAssetId: string | null;
   immichStartDate: string | null;
+  category: 'event' | 'month' | 'film-roll' | 'hidden' | null;
 }
 
 export interface PortfolioAssetConfig {
@@ -235,6 +236,7 @@ export interface PublicAlbum {
   sortOrder: number;
   shareUrl: string | null;
   startDate: string | null;
+  category: 'event' | 'month' | 'film-roll' | 'hidden' | null;
   assets?: PublicAsset[];
 }
 
@@ -271,6 +273,8 @@ export interface HomeSpecialtySection {
 
 export interface HomePageData {
   featuredAlbums: PublicAlbum[];
+  monthAlbums: PublicAlbum[];
+  filmRollAlbums: PublicAlbum[];
   featuredPeople: PublicPersonSummary[];
   signatureAssets: PublicAsset[];
   specialtySections: HomeSpecialtySection[];

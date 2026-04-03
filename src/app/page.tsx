@@ -33,6 +33,8 @@ const PREVIEW_SIGNATURES = [
 
 const EMPTY_HOME_DATA: HomePageData = {
   featuredAlbums: [],
+  monthAlbums: [],
+  filmRollAlbums: [],
   featuredPeople: [],
   signatureAssets: [],
   specialtySections: [],
@@ -178,7 +180,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <AlbumGrid albums={data.featuredAlbums} />
+      <AlbumGrid albums={data.featuredAlbums} title="Events" />
+      {data.monthAlbums.length > 0 && (
+        <AlbumGrid albums={data.monthAlbums} title="Monthly archives" />
+      )}
+      {data.filmRollAlbums.length > 0 && (
+        <AlbumGrid albums={data.filmRollAlbums} title="Film rolls" />
+      )}
     </div>
   );
 }

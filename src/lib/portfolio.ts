@@ -91,7 +91,7 @@ interface PortfolioAssetQuery {
 }
 
 export async function getHomePageData() {
-  const publicAlbums = await getPublicAlbums();
+  const allPublicAlbums = await getAllPublicAlbums();
   const signatureAssets = await getPortfolioAssets({
     genres: [...SIGNATURE_GENRES],
     roles: ["signature"],
@@ -100,7 +100,9 @@ export async function getHomePageData() {
   });
 
   return {
-    featuredAlbums: publicAlbums,
+    featuredAlbums: allPublicAlbums.filter((a) => !a.category || a.category === "event"),
+    monthAlbums: allPublicAlbums.filter((a) => a.category === "month"),
+    filmRollAlbums: allPublicAlbums.filter((a) => a.category === "film-roll"),
     featuredPeople: (await getPublicPeople()).slice(0, 4),
     signatureAssets:
       signatureAssets.length > 0
@@ -124,6 +126,23 @@ export async function getHomePageData() {
   } satisfies HomePageData;
 }
 
+async function getAllPublicAlbums() {
+  const env = getPortfolioEnv();
+  if (!env.hasImmichConfig) {
+    return [] satisfies PublicAlbum[];
+  }
+
+  const configs = listAlbumConfigs();
+  const visibleCounts = countVisibleAssetsByAlbum(listAssetAssociations());
+
+  return configs
+    .filter((config) => config.visibility === "public" && config.category !== "hidden")
+    .map((config) =>
+      buildPublicAlbumSummary(config, null, visibleCounts.get(config.immichAlbumId) ?? 0),
+    )
+    .sort(sortAlbumSummaries);
+}
+
 export async function getPublicAlbums() {
   const env = getPortfolioEnv();
   if (!env.hasImmichConfig) {
@@ -136,7 +155,7 @@ export async function getPublicAlbums() {
   const visibleCounts = countVisibleAssetsByAlbum(listAssetAssociations());
 
   return configs
-    .filter((config) => config.visibility === "public")
+    .filter((config) => config.visibility === "public" && config.category !== "hidden")
     .map((config) =>
       buildPublicAlbumSummary(config, null, visibleCounts.get(config.immichAlbumId) ?? 0),
     )
@@ -440,6 +459,7 @@ export function patchAlbumConfig(
     titleOverride: patch.titleOverride,
     descriptionOverride: patch.descriptionOverride,
     shareUrl: patch.shareUrl,
+    category: patch.category,
   });
 }
 
@@ -687,6 +707,7 @@ function buildPublicAlbumSummary(
     sortOrder: config.sortOrder,
     shareUrl: config.shareUrl,
     startDate: immichStart,
+    category: config.category,
   } satisfies PublicAlbum;
 }
 

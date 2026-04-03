@@ -35,6 +35,7 @@ interface AlbumConfigInput {
   immichDescription?: string | null;
   immichThumbnailAssetId?: string | null;
   immichStartDate?: string | null;
+  category?: PortfolioAlbumConfig['category'];
 }
 
 interface AlbumConfigPatch {
@@ -46,6 +47,7 @@ interface AlbumConfigPatch {
   titleOverride?: string | null;
   descriptionOverride?: string | null;
   shareUrl?: string | null;
+  category?: PortfolioAlbumConfig['category'];
 }
 
 interface AssetConfigPatch {
@@ -237,6 +239,7 @@ export function getDatabase() {
     ensureAssetAnnotationGenreSchema(db);
     ensureAssetAnnotationAiColumns(db);
     ensureAlbumCachedColumns(db);
+    ensureAlbumCategoryColumn(db);
 
     globalThis.__portfolioDb = db;
   }
@@ -369,6 +372,18 @@ function ensureAlbumCachedColumns(db: DatabaseSync) {
   }
 }
 
+function ensureAlbumCategoryColumn(db: DatabaseSync) {
+  const columns = new Set(
+    (db.prepare(`PRAGMA table_info(album_configs)`).all() as Array<{ name?: string }>)
+      .map((c) => c.name ?? ""),
+  );
+  if (!columns.has("category")) {
+    db.exec(
+      `ALTER TABLE album_configs ADD COLUMN category TEXT CHECK (category IS NULL OR category IN ('event', 'month', 'film-roll', 'hidden'))`,
+    );
+  }
+}
+
 export function listAlbumConfigs() {
   const rows = getDatabase()
     .prepare(
@@ -387,7 +402,8 @@ export function listAlbumConfigs() {
           immich_title,
           immich_description,
           immich_thumbnail_asset_id,
-          immich_start_date
+          immich_start_date,
+          category
         FROM album_configs
         ORDER BY featured DESC, sort_order ASC, slug ASC
       `,
@@ -415,7 +431,8 @@ export function getAlbumConfigBySlug(slug: string) {
           immich_title,
           immich_description,
           immich_thumbnail_asset_id,
-          immich_start_date
+          immich_start_date,
+          category
         FROM album_configs
         WHERE slug = ?
       `,
@@ -443,7 +460,8 @@ export function getAlbumConfig(immichAlbumId: string) {
           immich_title,
           immich_description,
           immich_thumbnail_asset_id,
-          immich_start_date
+          immich_start_date,
+          category
         FROM album_configs
         WHERE immich_album_id = ?
       `,
@@ -485,6 +503,12 @@ export function upsertAlbumDefaults(input: AlbumConfigInput) {
       input.immichThumbnailAssetId ?? null,
       input.immichStartDate ?? null,
     );
+  // category is set separately so syncs never overwrite a manually-assigned category
+  if (input.category !== undefined) {
+    getDatabase()
+      .prepare(`UPDATE album_configs SET category = ? WHERE immich_album_id = ?`)
+      .run(input.category ?? null, input.immichAlbumId);
+  }
 }
 
 export function updateAlbumConfig(
@@ -532,6 +556,11 @@ export function updateAlbumConfig(
   if (patch.shareUrl !== undefined) {
     assignments.push("share_url = ?");
     values.push(patch.shareUrl);
+  }
+
+  if (patch.category !== undefined) {
+    assignments.push("category = ?");
+    values.push(patch.category ?? null);
   }
 
   if (!assignments.length) {
@@ -1551,6 +1580,7 @@ function mapAlbumConfig(row: Record<string, unknown>): PortfolioAlbumConfig {
     immichDescription: nullableString(row.immich_description),
     immichThumbnailAssetId: nullableString(row.immich_thumbnail_asset_id),
     immichStartDate: nullableString(row.immich_start_date),
+    category: (row.category as PortfolioAlbumConfig["category"]) ?? null,
   };
 }
 

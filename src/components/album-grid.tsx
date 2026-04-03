@@ -7,7 +7,7 @@ import type { PublicAlbum } from "@/lib/types";
 
 const DEFAULT_SHOW = 25;
 
-export function AlbumGrid({ albums }: { albums: PublicAlbum[] }) {
+export function AlbumGrid({ albums, title }: { albums: PublicAlbum[]; title?: string }) {
   const [expanded, setExpanded] = useState(false);
 
   if (albums.length === 0) return null;
@@ -17,6 +17,11 @@ export function AlbumGrid({ albums }: { albums: PublicAlbum[] }) {
 
   return (
     <section>
+      {title && (
+        <h2 className="mb-3 font-mono text-xs uppercase tracking-[0.22em] text-dusk">
+          {title}
+        </h2>
+      )}
       <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
         {visible.map((album) => (
           <AlbumCard key={album.id} album={album} />
@@ -28,7 +33,7 @@ export function AlbumGrid({ albums }: { albums: PublicAlbum[] }) {
           <button
             type="button"
             onClick={() => setExpanded((e) => !e)}
-            className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/78 px-6 py-3 font-mono text-sm text-dusk transition hover:border-pine/30 hover:text-pine"
+            className="inline-flex items-center gap-2.5 rounded-full border border-black/12 bg-white/78 px-8 py-3.5 font-mono text-sm font-medium text-dusk transition hover:border-pine/30 hover:text-pine"
           >
             {expanded ? (
               <>

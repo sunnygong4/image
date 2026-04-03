@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 
-import type { PortfolioVisibility } from "@/lib/types";
+import type { PortfolioAlbumConfig, PortfolioVisibility } from "@/lib/types";
 
 import { getAlbumConfig } from "@/lib/db";
 import { patchAlbumConfig } from "@/lib/portfolio";
@@ -34,6 +34,7 @@ export async function PATCH(
       titleOverride: normalizeNullableText(body.titleOverride),
       descriptionOverride: normalizeNullableText(body.descriptionOverride),
       shareUrl: normalizeNullableText(body.shareUrl),
+      category: normalizeCategory(body.category),
     };
 
     const updated = patchAlbumConfig(albumId, patch);
@@ -81,4 +82,12 @@ function normalizeNullableText(value: unknown) {
 
   const trimmed = value.trim();
   return trimmed ? trimmed : null;
+}
+
+function normalizeCategory(value: unknown): PortfolioAlbumConfig["category"] {
+  if (value === "event" || value === "month" || value === "film-roll" || value === "hidden") {
+    return value;
+  }
+
+  return null;
 }

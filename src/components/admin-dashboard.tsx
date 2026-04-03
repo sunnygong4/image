@@ -143,6 +143,7 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
         titleOverride: emptyToNull(formData.get("titleOverride")),
         descriptionOverride: emptyToNull(formData.get("descriptionOverride")),
         shareUrl: emptyToNull(formData.get("shareUrl")),
+        category: emptyToNull(formData.get("category")),
       },
       "Album settings saved.",
     );
@@ -334,6 +335,15 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
                     </Field>
                     <Field label="Immich share URL" span="full">
                       <input name="shareUrl" defaultValue={album.shareUrl ?? ""} className="input-field" />
+                    </Field>
+                    <Field label="Category">
+                      <select name="category" defaultValue={album.category ?? ""} className="input-field">
+                        <option value="">None (event)</option>
+                        <option value="event">Event</option>
+                        <option value="month">Month</option>
+                        <option value="film-roll">Film roll</option>
+                        <option value="hidden">Hidden</option>
+                      </select>
                     </Field>
                   </div>
 

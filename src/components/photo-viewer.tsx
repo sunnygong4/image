@@ -729,9 +729,17 @@ export function PhotoViewer({
   useEffect(() => {
     function handleKeydown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        closeToolMenu();
-        setInspectorOpen(false);
-        resetView();
+        // First press closes overlays; if nothing is open, go back to album
+        if (toolMenu) { closeToolMenu(); return; }
+        if (inspectorOpen) { setInspectorOpen(false); return; }
+        router.push(navigation.backHref);
+        return;
+      }
+
+      if (event.key === " ") {
+        event.preventDefault();
+        // Space → toggle 100% zoom at centre of stage
+        toggleZoomOneHundred({ x: 0, y: 0 });
         return;
       }
 
@@ -773,7 +781,7 @@ export function PhotoViewer({
 
     window.addEventListener("keydown", handleKeydown);
     return () => window.removeEventListener("keydown", handleKeydown);
-  }, [navigation.next, navigation.previous, router]);
+  }, [navigation.backHref, navigation.next, navigation.previous, router, toolMenu, inspectorOpen]);
 
   useEffect(() => {
     if (
