@@ -17,7 +17,7 @@ export function AlbumGrid({ albums }: { albums: PublicAlbum[] }) {
 
   return (
     <section>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
         {visible.map((album) => (
           <AlbumCard key={album.id} album={album} />
         ))}
