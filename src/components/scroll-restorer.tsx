@@ -6,25 +6,39 @@ import { usePathname } from "next/navigation";
 export function ScrollRestorer() {
   const pathname = usePathname();
 
+  // Save scroll on every internal link click — capture phase fires BEFORE
+  // React/Next.js handles the event, so window.scrollY is still correct.
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      const anchor = (e.target as Element).closest("a[href]");
+      if (!anchor) return;
+      const href = anchor.getAttribute("href");
+      // Only save for internal navigations that change the path
+      if (href?.startsWith("/") && href !== pathname) {
+        sessionStorage.setItem(`scroll-pos:${pathname}`, String(window.scrollY));
+      }
+    }
+    document.addEventListener("click", handleClick, true /* capture */);
+    return () => document.removeEventListener("click", handleClick, true);
+  }, [pathname]);
+
+  // Restore scroll position after the page mounts
   useEffect(() => {
     const key = `scroll-pos:${pathname}`;
     const saved = sessionStorage.getItem(key);
-    if (saved === null) return;
+    if (!saved) return;
 
     const top = parseInt(saved, 10);
     if (!top) return;
 
     sessionStorage.removeItem(key);
 
-    // force-dynamic pages fetch server content before painting.
-    // Two rAFs ensure at least two render cycles have completed,
-    // then a short timeout covers slower network/image-driven layout.
+    // Two rAFs ensure at least two render cycles complete (content is painted),
+    // then a 250ms retry covers cases where images shift the layout taller.
     let raf1: number, raf2: number, tid: ReturnType<typeof setTimeout>;
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
-        // First attempt — works if content is already tall enough
         window.scrollTo({ top, behavior: "instant" });
-        // Second attempt at 250ms handles cases where images pushed the page taller
         tid = setTimeout(() => {
           window.scrollTo({ top, behavior: "instant" });
         }, 250);
@@ -35,14 +49,6 @@ export function ScrollRestorer() {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
       clearTimeout(tid);
-    };
-  }, [pathname]);
-
-  useEffect(() => {
-    const key = `scroll-pos:${pathname}`;
-    return () => {
-      // Save scroll position the moment we navigate away
-      sessionStorage.setItem(key, String(window.scrollY));
     };
   }, [pathname]);
 
