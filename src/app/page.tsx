@@ -11,7 +11,7 @@ import {
 import type { HomePageData } from "@/lib/types";
 
 const SIGNATURE_SECTION_ID = "signature-work";
-const HOME_DATA_TIMEOUT_MS = 2500;
+const HOME_DATA_TIMEOUT_MS = 8000;
 
 const PREVIEW_SIGNATURES = [
   {
