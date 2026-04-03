@@ -181,9 +181,6 @@ export default async function HomePage() {
       </section>
 
       <AlbumGrid albums={data.featuredAlbums} title="Events" />
-      {data.monthAlbums.length > 0 && (
-        <AlbumGrid albums={data.monthAlbums} title="Monthly archives" />
-      )}
     </div>
   );
 }

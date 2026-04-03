@@ -83,13 +83,13 @@ export function MonthlySidebar({ albums }: { albums: PublicAlbum[] }) {
 
   return (
     <>
-      {/* Toggle button — fixed right edge, vertically centred */}
+      {/* Toggle button — fixed left edge, vertically centred */}
       <button
         type="button"
         aria-label={open ? "Close monthly highlights" : "Open monthly highlights"}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className={`fixed right-0 top-1/2 z-40 -translate-y-1/2 flex flex-col items-center gap-1.5 rounded-l-2xl border border-r-0 px-2.5 py-4 shadow-soft transition-all duration-300 ${
+        className={`fixed left-0 top-1/2 z-40 -translate-y-1/2 flex flex-col items-center gap-1.5 rounded-r-2xl border border-l-0 px-2.5 py-4 shadow-soft transition-all duration-300 ${
           open
             ? "border-pine/30 bg-pine text-white"
             : "border-black/10 bg-white/90 text-dusk hover:border-pine/30 hover:text-pine"
@@ -131,8 +131,8 @@ export function MonthlySidebar({ albums }: { albums: PublicAlbum[] }) {
       {/* Slide-out panel */}
       <div
         ref={panelRef}
-        className={`fixed right-0 top-0 z-50 flex h-full w-72 flex-col border-l border-black/10 bg-white/96 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-          open ? "translate-x-0" : "translate-x-full"
+        className={`fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-black/10 bg-white/96 shadow-2xl backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          open ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-hidden={!open}
       >

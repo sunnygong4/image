@@ -26,6 +26,11 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
   const [isAlbumSyncPending, startAlbumSyncTransition] = useTransition();
   const [isPeopleSyncPending, startPeopleSyncTransition] = useTransition();
   const [isSavePending, startSaveTransition] = useTransition();
+  const [geminiState, setGeminiState] = useState<{
+    assetId: string;
+    status: "loading" | "ok" | "error";
+    message: string;
+  } | null>(null);
   const deferredAlbumFilter = useDeferredValue(albumFilter);
   const deferredPeopleFilter = useDeferredValue(peopleFilter);
 
@@ -147,6 +152,23 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
       },
       "Album settings saved.",
     );
+  }
+
+  async function handleAnalyze(assetId: string) {
+    setGeminiState({ assetId, status: "loading", message: "Analyzing…" });
+    try {
+      const response = await fetch(`/api/admin/assets/${assetId}/analyze`, { method: "POST" });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        setGeminiState({ assetId, status: "error", message: payload?.error ?? "Analysis failed." });
+        return;
+      }
+      setGeminiState({ assetId, status: "ok", message: "Analysis saved ✓" });
+      router.refresh();
+      setTimeout(() => setGeminiState(null), 3000);
+    } catch (err) {
+      setGeminiState({ assetId, status: "error", message: err instanceof Error ? err.message : "Network error." });
+    }
   }
 
   async function handleAssetSubmit(
@@ -441,16 +463,21 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
                               </button>
                               <button
                                 type="button"
-                                onClick={() => runJsonAction(
-                                  `/api/admin/assets/${asset.id}/analyze`,
-                                  null,
-                                  "Gemini analysis saved.",
-                                  "POST",
+                                onClick={() => handleAnalyze(asset.id)}
+                                disabled={geminiState?.assetId === asset.id && geminiState.status === "loading"}
+                                className={cn(
+                                  "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                                  geminiState?.assetId === asset.id && geminiState.status === "ok"
+                                    ? "border-pine/30 bg-pine/10 text-pine"
+                                    : geminiState?.assetId === asset.id && geminiState.status === "error"
+                                      ? "border-red-300 bg-red-50 text-red-600"
+                                      : "border-amber-400/40 bg-amber-50 text-amber-700 hover:bg-amber-400 hover:text-white",
+                                  geminiState?.assetId === asset.id && geminiState.status === "loading" && "cursor-wait opacity-70",
                                 )}
-                                disabled={isSavePending}
-                                className="rounded-full border border-amber-400/40 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-400 hover:text-white disabled:opacity-50"
                               >
-                                ✦ Analyze with Gemini
+                                {geminiState?.assetId === asset.id
+                                  ? geminiState.message
+                                  : "✦ Analyze with Gemini"}
                               </button>
                             </div>
                           </div>
