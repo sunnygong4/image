@@ -31,6 +31,10 @@ interface AlbumConfigInput {
   immichAlbumId: string;
   slug: string;
   coverAssetId?: string | null;
+  immichTitle?: string | null;
+  immichDescription?: string | null;
+  immichThumbnailAssetId?: string | null;
+  immichStartDate?: string | null;
 }
 
 interface AlbumConfigPatch {
@@ -232,6 +236,7 @@ export function getDatabase() {
 
     ensureAssetAnnotationGenreSchema(db);
     ensureAssetAnnotationAiColumns(db);
+    ensureAlbumCachedColumns(db);
 
     globalThis.__portfolioDb = db;
   }
@@ -341,6 +346,29 @@ function ensureAssetAnnotationAiColumns(db: DatabaseSync) {
   }
 }
 
+function ensureAlbumCachedColumns(db: DatabaseSync) {
+  const columns = new Set(
+    (
+      db
+        .prepare(`PRAGMA table_info(album_configs)`)
+        .all() as Array<{ name?: string }>
+    ).map((column) => column.name ?? ""),
+  );
+
+  const additions = [
+    ["immich_title", "ALTER TABLE album_configs ADD COLUMN immich_title TEXT"],
+    ["immich_description", "ALTER TABLE album_configs ADD COLUMN immich_description TEXT"],
+    ["immich_thumbnail_asset_id", "ALTER TABLE album_configs ADD COLUMN immich_thumbnail_asset_id TEXT"],
+    ["immich_start_date", "ALTER TABLE album_configs ADD COLUMN immich_start_date TEXT"],
+  ] as const;
+
+  for (const [column, statement] of additions) {
+    if (!columns.has(column)) {
+      db.exec(statement);
+    }
+  }
+}
+
 export function listAlbumConfigs() {
   const rows = getDatabase()
     .prepare(
@@ -355,7 +383,11 @@ export function listAlbumConfigs() {
           title_override,
           description_override,
           share_url,
-          updated_at
+          updated_at,
+          immich_title,
+          immich_description,
+          immich_thumbnail_asset_id,
+          immich_start_date
         FROM album_configs
         ORDER BY featured DESC, sort_order ASC, slug ASC
       `,
@@ -379,7 +411,11 @@ export function getAlbumConfigBySlug(slug: string) {
           title_override,
           description_override,
           share_url,
-          updated_at
+          updated_at,
+          immich_title,
+          immich_description,
+          immich_thumbnail_asset_id,
+          immich_start_date
         FROM album_configs
         WHERE slug = ?
       `,
@@ -403,7 +439,11 @@ export function getAlbumConfig(immichAlbumId: string) {
           title_override,
           description_override,
           share_url,
-          updated_at
+          updated_at,
+          immich_title,
+          immich_description,
+          immich_thumbnail_asset_id,
+          immich_start_date
         FROM album_configs
         WHERE immich_album_id = ?
       `,
@@ -421,14 +461,30 @@ export function upsertAlbumDefaults(input: AlbumConfigInput) {
           immich_album_id,
           slug,
           cover_asset_id,
-          visibility
+          visibility,
+          immich_title,
+          immich_description,
+          immich_thumbnail_asset_id,
+          immich_start_date
         )
-        VALUES (?, ?, ?, 'public')
+        VALUES (?, ?, ?, 'public', ?, ?, ?, ?)
         ON CONFLICT(immich_album_id) DO UPDATE SET
-          cover_asset_id = COALESCE(album_configs.cover_asset_id, excluded.cover_asset_id)
+          cover_asset_id = COALESCE(album_configs.cover_asset_id, excluded.cover_asset_id),
+          immich_title = excluded.immich_title,
+          immich_description = excluded.immich_description,
+          immich_thumbnail_asset_id = excluded.immich_thumbnail_asset_id,
+          immich_start_date = excluded.immich_start_date
       `,
     )
-    .run(input.immichAlbumId, input.slug, input.coverAssetId ?? null);
+    .run(
+      input.immichAlbumId,
+      input.slug,
+      input.coverAssetId ?? null,
+      input.immichTitle ?? null,
+      input.immichDescription ?? null,
+      input.immichThumbnailAssetId ?? null,
+      input.immichStartDate ?? null,
+    );
 }
 
 export function updateAlbumConfig(
@@ -1491,6 +1547,10 @@ function mapAlbumConfig(row: Record<string, unknown>): PortfolioAlbumConfig {
     descriptionOverride: nullableString(row.description_override),
     shareUrl: nullableString(row.share_url),
     updatedAt: String(row.updated_at),
+    immichTitle: nullableString(row.immich_title),
+    immichDescription: nullableString(row.immich_description),
+    immichThumbnailAssetId: nullableString(row.immich_thumbnail_asset_id),
+    immichStartDate: nullableString(row.immich_start_date),
   };
 }
 

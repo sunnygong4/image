@@ -39,6 +39,11 @@ export interface PortfolioAlbumConfig {
   descriptionOverride: string | null;
   shareUrl: string | null;
   updatedAt: string;
+  // Cached Immich metadata — populated during sync so homepage never calls Immich API
+  immichTitle: string | null;
+  immichDescription: string | null;
+  immichThumbnailAssetId: string | null;
+  immichStartDate: string | null;
 }
 
 export interface PortfolioAssetConfig {
