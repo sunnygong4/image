@@ -427,17 +427,32 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
                           <div className="flex-1 min-w-0">
                             <p className="display-font text-xl text-ink truncate">{asset.title}</p>
                             <p className="text-sm text-dusk">{asset.originalFileName}</p>
-                            <button
-                              type="button"
-                              onClick={() => runJsonAction(
-                                `/api/admin/albums/${asset.albumId}`,
-                                { coverAssetId: asset.id },
-                                "Cover photo updated.",
-                              )}
-                              className="mt-2 rounded-full border border-pine/30 bg-pine/10 px-3 py-1.5 text-xs font-semibold text-pine transition hover:bg-pine hover:text-white"
-                            >
-                              Set as album cover
-                            </button>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => runJsonAction(
+                                  `/api/admin/albums/${asset.albumId}`,
+                                  { coverAssetId: asset.id },
+                                  "Cover photo updated.",
+                                )}
+                                className="rounded-full border border-pine/30 bg-pine/10 px-3 py-1.5 text-xs font-semibold text-pine transition hover:bg-pine hover:text-white"
+                              >
+                                Set as album cover
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => runJsonAction(
+                                  `/api/admin/assets/${asset.id}/analyze`,
+                                  null,
+                                  "Gemini analysis saved.",
+                                  "POST",
+                                )}
+                                disabled={isSavePending}
+                                className="rounded-full border border-amber-400/40 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-400 hover:text-white disabled:opacity-50"
+                              >
+                                ✦ Analyze with Gemini
+                              </button>
+                            </div>
                           </div>
                         </div>
                         <div className="space-y-4">

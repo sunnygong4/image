@@ -25,6 +25,7 @@ export const HOME_NAV_LINKS = [
   { href: "/work/street", label: "Street" },
   { href: "/work/wildlife", label: "Wildlife" },
   { href: "/work/event", label: "Events" },
+  { href: "/film-rolls", label: "Film" },
   { href: "/contact", label: "Contact" },
 ] as const;
 

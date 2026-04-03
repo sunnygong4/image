@@ -143,6 +143,21 @@ async function getAllPublicAlbums() {
     .sort(sortAlbumSummaries);
 }
 
+export async function getFilmRollAlbums() {
+  const env = getPortfolioEnv();
+  if (!env.hasImmichConfig) return [] satisfies PublicAlbum[];
+
+  const configs = listAlbumConfigs();
+  const visibleCounts = countVisibleAssetsByAlbum(listAssetAssociations());
+
+  return configs
+    .filter((config) => config.visibility === "public" && config.category === "film-roll")
+    .map((config) =>
+      buildPublicAlbumSummary(config, null, visibleCounts.get(config.immichAlbumId) ?? 0),
+    )
+    .sort(sortAlbumSummaries);
+}
+
 export async function getPublicAlbums() {
   const env = getPortfolioEnv();
   if (!env.hasImmichConfig) {

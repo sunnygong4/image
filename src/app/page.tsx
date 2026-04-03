@@ -184,9 +184,6 @@ export default async function HomePage() {
       {data.monthAlbums.length > 0 && (
         <AlbumGrid albums={data.monthAlbums} title="Monthly archives" />
       )}
-      {data.filmRollAlbums.length > 0 && (
-        <AlbumGrid albums={data.filmRollAlbums} title="Film rolls" />
-      )}
     </div>
   );
 }
