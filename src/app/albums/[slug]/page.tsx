@@ -26,7 +26,7 @@ export default async function AlbumPage({
           <div className="aspect-[4/3] bg-ink/10">
             {album.coverAssetId ? (
               <img
-                src={`/api/media/${album.coverAssetId}/thumb?size=fullsize`}
+                src={`/api/media/${album.coverAssetId}/thumb?size=preview`}
                 alt={album.title}
                 className="h-full w-full object-cover"
               />
