@@ -441,6 +441,7 @@ export async function syncPortfolioFromImmich() {
       immichDescription: album.description ?? null,
       immichThumbnailAssetId: album.albumThumbnailAssetId ?? null,
       immichStartDate: album.startDate ?? null,
+      category: guessAlbumCategory(album.albumName),
     });
     takenSlugs.add(nextSlug.toLowerCase());
   }
@@ -968,6 +969,23 @@ function compareAssetIds(
     (associationA?.sortOrder ?? 0) - (associationB?.sortOrder ?? 0) ||
     a.localeCompare(b)
   );
+}
+
+const MONTH_NAMES = [
+  "january","february","march","april","may","june",
+  "july","august","september","october","november","december",
+];
+const FILM_ROLL_RE = /^film\s+roll\s+\d+$/i;
+const MONTH_YEAR_RE = new RegExp(
+  `^(${MONTH_NAMES.join("|")})\\s+\\d{4}$`,
+  "i",
+);
+
+function guessAlbumCategory(name: string): PortfolioAlbumConfig["category"] {
+  const trimmed = name.trim();
+  if (FILM_ROLL_RE.test(trimmed)) return "film-roll";
+  if (MONTH_YEAR_RE.test(trimmed)) return "month";
+  return null;
 }
 
 function sortAlbumSummaries(a: PublicAlbum, b: PublicAlbum) {

@@ -506,7 +506,7 @@ export function upsertAlbumDefaults(input: AlbumConfigInput) {
   // category is set separately so syncs never overwrite a manually-assigned category
   if (input.category !== undefined) {
     getDatabase()
-      .prepare(`UPDATE album_configs SET category = ? WHERE immich_album_id = ?`)
+      .prepare(`UPDATE album_configs SET category = ? WHERE immich_album_id = ? AND category IS NULL`)
       .run(input.category ?? null, input.immichAlbumId);
   }
 }
