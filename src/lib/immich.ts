@@ -374,13 +374,17 @@ function normalizeAsset(input: unknown): ImmichAsset {
           iso: typeof exifRecord.iso === "number" ? exifRecord.iso : null,
           exposureTime: nullableString(exifRecord.exposureTime),
           imageWidth:
-            typeof exifRecord.imageWidth === "number"
-              ? exifRecord.imageWidth
-              : null,
+            typeof exifRecord.exifImageWidth === "number"
+              ? exifRecord.exifImageWidth
+              : typeof exifRecord.imageWidth === "number"
+                ? exifRecord.imageWidth
+                : null,
           imageHeight:
-            typeof exifRecord.imageHeight === "number"
-              ? exifRecord.imageHeight
-              : null,
+            typeof exifRecord.exifImageHeight === "number"
+              ? exifRecord.exifImageHeight
+              : typeof exifRecord.imageHeight === "number"
+                ? exifRecord.imageHeight
+                : null,
         }
       : null,
   };
