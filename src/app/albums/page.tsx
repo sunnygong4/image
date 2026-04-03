@@ -28,7 +28,7 @@ export default async function AlbumsPage() {
         </p>
       </section>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-3 gap-3 lg:grid-cols-5">
         {albums.map((album) => (
           <AlbumCard key={album.id} album={album} />
         ))}
