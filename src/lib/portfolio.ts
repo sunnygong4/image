@@ -143,6 +143,23 @@ async function getAllPublicAlbums() {
     .sort(sortAlbumSummaries);
 }
 
+export async function getMonthAlbums() {
+  const env = getPortfolioEnv();
+  if (!env.hasImmichConfig) return [] satisfies PublicAlbum[];
+
+  try {
+    const configs = listAlbumConfigs();
+    return configs
+      .filter((config) => config.visibility === "public" && config.category === "month")
+      .map((config) =>
+        buildPublicAlbumSummary(config, null, 0),
+      )
+      .sort(sortAlbumSummaries);
+  } catch {
+    return [] satisfies PublicAlbum[];
+  }
+}
+
 export async function getFilmRollAlbums() {
   const env = getPortfolioEnv();
   if (!env.hasImmichConfig) return [] satisfies PublicAlbum[];

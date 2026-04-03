@@ -5,14 +5,20 @@ import { getFilmRollAlbums } from "@/lib/portfolio";
 export const dynamic = "force-dynamic";
 
 export default async function FilmRollsPage() {
-  const albums = await getFilmRollAlbums();
+  let albums: Awaited<ReturnType<typeof getFilmRollAlbums>> = [];
+
+  try {
+    albums = await getFilmRollAlbums();
+  } catch {
+    // DB not yet initialised or migration pending — show empty state
+  }
 
   if (!albums.length) {
     return (
       <EmptyState
         eyebrow="Film Rolls"
         title="No film rolls yet"
-        body="Mark albums as Film Roll in the admin area to have them appear here."
+        body="Mark albums as Film Roll in the admin area to have them appear here, then run a sync."
       />
     );
   }
