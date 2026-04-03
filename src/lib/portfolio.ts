@@ -130,29 +130,16 @@ export async function getPublicAlbums() {
     return [] satisfies PublicAlbum[];
   }
 
-  const [configs, immichAlbums] = await Promise.all([
-    Promise.resolve(listAlbumConfigs()),
-    listImmichAlbums(),
-  ]);
-
+  // Read entirely from SQLite — no Immich API call needed.
+  // Immich metadata is cached into album_configs during sync.
+  const configs = listAlbumConfigs();
   const visibleCounts = countVisibleAssetsByAlbum(listAssetAssociations());
-  const immichById = new Map(immichAlbums.map((album) => [album.id, album]));
 
   return configs
     .filter((config) => config.visibility === "public")
-    .map((config) => {
-      const album = immichById.get(config.immichAlbumId);
-      if (!album) {
-        return null;
-      }
-
-      return buildPublicAlbumSummary(
-        config,
-        album,
-        visibleCounts.get(config.immichAlbumId) ?? 0,
-      );
-    })
-    .filter((value): value is PublicAlbum => Boolean(value))
+    .map((config) =>
+      buildPublicAlbumSummary(config, null, visibleCounts.get(config.immichAlbumId) ?? 0),
+    )
     .sort(sortAlbumSummaries);
 }
 
@@ -416,6 +403,10 @@ export async function syncPortfolioFromImmich() {
       immichAlbumId: album.id,
       slug: nextSlug,
       coverAssetId: album.albumThumbnailAssetId ?? null,
+      immichTitle: album.albumName,
+      immichDescription: album.description ?? null,
+      immichThumbnailAssetId: album.albumThumbnailAssetId ?? null,
+      immichStartDate: album.startDate ?? null,
     });
     takenSlugs.add(nextSlug.toLowerCase());
   }
@@ -676,21 +667,26 @@ function getAdminPeople(): AdminPersonSummary[] {
 
 function buildPublicAlbumSummary(
   config: PortfolioAlbumConfig,
-  album: ImmichAlbum,
+  album: ImmichAlbum | null,
   assetCount: number,
 ) {
+  const immichTitle = album?.albumName ?? config.immichTitle ?? config.slug;
+  const immichDesc = album?.description ?? config.immichDescription ?? null;
+  const immichThumb = album?.albumThumbnailAssetId ?? config.immichThumbnailAssetId ?? null;
+  const immichStart = album?.startDate ?? config.immichStartDate ?? null;
+  const firstAssetId = album?.assets?.[0]?.id ?? null;
+
   return {
-    id: album.id,
+    id: album?.id ?? config.immichAlbumId,
     slug: config.slug,
-    title: config.titleOverride ?? album.albumName,
-    description: config.descriptionOverride ?? album.description ?? null,
-    coverAssetId:
-      config.coverAssetId ?? album.albumThumbnailAssetId ?? album.assets?.[0]?.id ?? null,
+    title: config.titleOverride ?? immichTitle,
+    description: config.descriptionOverride ?? immichDesc,
+    coverAssetId: config.coverAssetId ?? immichThumb ?? firstAssetId ?? null,
     assetCount,
     featured: config.featured,
     sortOrder: config.sortOrder,
     shareUrl: config.shareUrl,
-    startDate: album.startDate ?? null,
+    startDate: immichStart,
   } satisfies PublicAlbum;
 }
 
