@@ -29,7 +29,7 @@ export function getAiPipelineEnv() {
   const exportRoot = process.env.AI_EXPORT_ROOT ?? "";
   const batchStateDir = process.env.AI_BATCH_STATE_DIR ?? "ops/ai-ranking/state";
   const geminiApiKey = process.env.GEMINI_API_KEY ?? "";
-  const geminiModel = process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite";
+  const geminiModel = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
 
   return {
     batchStateDir: resolve(process.cwd(), batchStateDir),
