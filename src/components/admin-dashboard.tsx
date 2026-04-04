@@ -31,6 +31,13 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
     status: "loading" | "ok" | "error";
     message: string;
   } | null>(null);
+  const [batchAnalysis, setBatchAnalysis] = useState<{
+    albumId: string;
+    completed: number;
+    total: number;
+    errors: number;
+    done: boolean;
+  } | null>(null);
   const deferredAlbumFilter = useDeferredValue(albumFilter);
   const deferredPeopleFilter = useDeferredValue(peopleFilter);
 
@@ -152,6 +159,55 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
       },
       "Album settings saved.",
     );
+  }
+
+  function handleAnalyzeAlbum(albumId: string) {
+    setBatchAnalysis({ albumId, completed: 0, total: 0, errors: 0, done: false });
+    const es = new EventSource(`/api/admin/albums/${albumId}/analyze-batch`);
+    // EventSource only supports GET; use fetch+ReadableStream instead
+    es.close();
+
+    fetch(`/api/admin/albums/${albumId}/analyze-batch`, { method: "POST" }).then(async (res) => {
+      if (!res.ok || !res.body) {
+        const payload = await res.json().catch(() => null);
+        setBatchAnalysis(null);
+        setFeedback(payload?.error ?? "Batch analysis failed.");
+        return;
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n\n");
+        buf = lines.pop() ?? "";
+        for (const line of lines) {
+          const dataLine = line.replace(/^data: /, "").trim();
+          if (!dataLine) continue;
+          try {
+            const msg = JSON.parse(dataLine) as {
+              total?: number; completed?: number; errors?: number; done?: boolean; status?: string;
+            };
+            setBatchAnalysis({
+              albumId,
+              completed: msg.completed ?? 0,
+              total: msg.total ?? 0,
+              errors: msg.errors ?? 0,
+              done: msg.done ?? false,
+            });
+            if (msg.done) {
+              router.refresh();
+              setTimeout(() => setBatchAnalysis(null), 4000);
+            }
+          } catch { /* malformed line */ }
+        }
+      }
+    }).catch((err) => {
+      setBatchAnalysis(null);
+      setFeedback(err instanceof Error ? err.message : "Batch analysis failed.");
+    });
   }
 
   async function handleAnalyze(assetId: string) {
@@ -374,7 +430,28 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
                     Feature this album in story sections
                   </label>
 
-                  <div className="mt-5 flex justify-end">
+                  <div className="mt-5 flex items-center justify-between gap-3">
+                    {batchAnalysis?.albumId === selectedAlbum?.id ? (
+                      <div className="flex items-center gap-3 text-sm text-dusk">
+                        <div className="h-1.5 w-32 overflow-hidden rounded-full bg-black/10">
+                          <div
+                            className="h-full rounded-full bg-amber-400 transition-all duration-300"
+                            style={{ width: batchAnalysis.total ? `${(batchAnalysis.completed / batchAnalysis.total) * 100}%` : "0%" }}
+                          />
+                        </div>
+                        {batchAnalysis.done
+                          ? `Done — ${batchAnalysis.completed} analyzed, ${batchAnalysis.errors} errors`
+                          : `Analyzing ${batchAnalysis.completed}/${batchAnalysis.total}…`}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => selectedAlbum && handleAnalyzeAlbum(selectedAlbum.id)}
+                        className="rounded-full border border-amber-400/40 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-400 hover:text-white"
+                      >
+                        ✦ Analyze all photos
+                      </button>
+                    )}
                     <button
                       type="submit"
                       disabled={isSavePending}
