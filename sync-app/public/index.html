@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Sync</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --border:    #2a2d3a;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --green:     #22c55e;
+      --amber:     #f59e0b;
+      --red:       #ef4444;
+      --blue:      #3b82f6;
+      --purple:    #8b5cf6;
+    }
+
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .header-left h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-left .paths {
+      margin-top: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      line-height: 1.7;
+    }
+
+    .ssh-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .ssh-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .ssh-badge.ok .dot   { background: var(--green); }
+    .ssh-badge.fail .dot { background: var(--red); }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      transition: opacity 0.15s, background 0.15s;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #2563eb; }
+
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: #22263a; }
+
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-danger:hover:not(:disabled) { background: #dc2626; }
+
+    .btn-sm { padding: 0.3rem 0.65rem; font-size: 0.72rem; }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+    td { padding: 0.65rem 1rem; vertical-align: middle; }
+
+    td.name {
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    td.stat { color: var(--muted); font-size: 0.77rem; white-space: nowrap; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .status-ok     { background: rgba(34,197,94,0.15);  color: var(--green); }
+    .status-behind { background: rgba(245,158,11,0.15); color: var(--amber); }
+    .status-local  { background: rgba(59,130,246,0.15); color: var(--blue); }
+    .status-remote { background: rgba(139,92,246,0.15); color: var(--purple); }
+    .status-empty  { background: rgba(100,116,139,0.12); color: var(--muted); }
+
+    td.actions { white-space: nowrap; }
+
+    /* ── Log panel ── */
+    #log-panel {
+      margin-top: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      display: none;
+    }
+    #log-panel.visible { display: block; }
+
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .log-header span { font-size: 0.8rem; font-weight: 600; }
+
+    #log-output {
+      padding: 0.75rem 1rem;
+      font-family: "Cascadia Mono", "Consolas", monospace;
+      font-size: 0.73rem;
+      color: #94a3b8;
+      max-height: 320px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.55;
+    }
+    #log-output .err  { color: var(--red); }
+    #log-output .done { color: var(--green); font-weight: 600; }
+
+    /* ── Confirm dialog ── */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.visible { display: flex; }
+
+    .dialog {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.75rem;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    }
+    .dialog h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+    .dialog p  { font-size: 0.82rem; color: #94a3b8; line-height: 1.55; margin-bottom: 1.25rem; }
+    .dialog strong { color: var(--amber); }
+    .dialog-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.3rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-row td { text-align: center; color: var(--muted); padding: 3rem; }
+
+    .loading-row td { text-align: center; color: var(--muted); padding: 2rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <h1>Photo Sync</h1>
+      <div class="paths" id="config-paths">Loading…</div>
+    </div>
+    <div id="ssh-badge" class="ssh-badge">
+      <span class="dot"></span>
+      <span>SSH</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn-primary" id="btn-refresh" onclick="loadStatus()">
+      Refresh status
+    </button>
+    <span id="last-updated" style="font-size:0.75rem;color:var(--muted)"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Folder</th>
+          <th>Local</th>
+          <th>Server</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="folder-table">
+        <tr class="loading-row"><td colspan="5"><span class="spinner"></span> Scanning…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Log panel -->
+  <div id="log-panel">
+    <div class="log-header">
+      <span id="log-title">Sync output</span>
+      <button class="btn-secondary btn-sm" onclick="closeLog()">Close</button>
+    </div>
+    <div id="log-output"></div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div class="overlay" id="confirm-overlay">
+    <div class="dialog">
+      <h3>⚠ Delete files on server?</h3>
+      <p>
+        Syncing <strong id="confirm-folder"></strong> with <strong>--delete</strong> will
+        remove any files on the server that are <em>not</em> in your local folder.
+        This is permanent and cannot be undone.
+      </p>
+      <div class="dialog-actions">
+        <button class="btn-secondary" onclick="closeConfirm()">Cancel</button>
+        <button class="btn-danger" id="confirm-ok">Yes, delete &amp; sync</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
