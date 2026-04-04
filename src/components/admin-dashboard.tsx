@@ -431,7 +431,7 @@ export function AdminDashboard({ data }: AdminDashboardProps) {
                   </label>
 
                   <div className="mt-5 flex items-center justify-between gap-3">
-                    {batchAnalysis?.albumId === selectedAlbum?.id ? (
+                    {batchAnalysis && batchAnalysis.albumId === selectedAlbum?.id ? (
                       <div className="flex items-center gap-3 text-sm text-dusk">
                         <div className="h-1.5 w-32 overflow-hidden rounded-full bg-black/10">
                           <div
